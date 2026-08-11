@@ -1,0 +1,21 @@
+{
+  "name": "abc-retail-app",
+  "version": "1.0.0",
+  "description": "ABC Retail - Azure Storage Services demo app (CLDV7112w ICE Tasks 1-4)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "@azure/data-tables": "^13.2.2",
+    "@azure/storage-blob": "^12.17.0",
+    "@azure/storage-queue": "^12.17.0",
+    "@azure/storage-file-share": "^12.17.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^9.0.1"
+  }
+}
