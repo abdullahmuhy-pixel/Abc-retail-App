@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ABC Retail - Azure Storage Demo</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 800px; margin: 30px auto; padding: 0 15px; }
+  section { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+  h2 { margin-top: 0; }
+  input, textarea, select { display: block; width: 100%; margin: 6px 0 12px; padding: 6px; }
+  button { background: #0078d4; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+  pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+</style>
+</head>
+<body>
+<h1>ABC Retail - Azure Storage Services Demo</h1>
+
+<section>
+  <h2>1. Add Customer (Azure Table Storage)</h2>
+  <form id="customerForm">
+    <input name="fullName" placeholder="Full name" required>
+    <input name="email" placeholder="Email" required>
+    <input name="phone" placeholder="Phone">
+    <input name="address" placeholder="Address">
+    <button type="submit">Add Customer</button>
+  </form>
+  <pre id="customerResult"></pre>
+</section>
+
+<section>
+  <h2>2. Add Product + Image (Azure Table + Blob Storage)</h2>
+  <form id="productForm">
+    <input name="name" placeholder="Product name" required>
+    <input name="description" placeholder="Description">
+    <input name="price" type="number" placeholder="Price" required>
+    <input name="category" placeholder="Category">
+    <input name="image" type="file" accept="image/*">
+    <button type="submit">Add Product</button>
+  </form>
+  <pre id="productResult"></pre>
+</section>
+
+<section>
+  <h2>3. Place Order (Azure Queue Storage)</h2>
+  <form id="orderForm">
+    <input name="customerId" placeholder="Customer RowKey" required>
+    <input name="productId" placeholder="Product RowKey" required>
+    <input name="quantity" type="number" placeholder="Quantity" required>
+    <button type="submit">Place Order</button>
+  </form>
+  <button id="peekBtn">Peek Queue</button>
+  <button id="processBtn">Process Queue (worker simulation)</button>
+  <pre id="orderResult"></pre>
+</section>
+
+<section>
+  <h2>4. Application Logs (Azure Files)</h2>
+  <button id="loadLogsBtn">List Log Files</button>
+  <pre id="logsResult"></pre>
+</section>
+
+<script>
+async function postJSON(url, body) {
+  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  return res.json();
+}
+
+document.getElementById("customerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target));
+  const result = await postJSON("/api/customers", data);
+  document.getElementById("customerResult").textContent = JSON.stringify(result, null, 2);
+});
+
+document.getElementById("productForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const res = await fetch("/api/products", { method: "POST", body: formData });
+  const result = await res.json();
+  document.getElementById("productResult").textContent = JSON.stringify(result, null, 2);
+});
+
+document.getElementById("orderForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target));
+  const result = await postJSON("/api/orders", data);
+  document.getElementById("orderResult").textContent = JSON.stringify(result, null, 2);
+});
+
+document.getElementById("peekBtn").addEventListener("click", async () => {
+  const res = await fetch("/api/orders/peek");
+  document.getElementById("orderResult").textContent = JSON.stringify(await res.json(), null, 2);
+});
+
+document.getElementById("processBtn").addEventListener("click", async () => {
+  const res = await fetch("/api/orders/process", { method: "POST" });
+  document.getElementById("orderResult").textContent = JSON.stringify(await res.json(), null, 2);
+});
+
+document.getElementById("loadLogsBtn").addEventListener("click", async () => {
+  const res = await fetch("/api/logs");
+  document.getElementById("logsResult").textContent = JSON.stringify(await res.json(), null, 2);
+});
+</script>
+</body>
+</html>
