@@ -1,4 +1,4 @@
-const { QueueClient } = require("@azure/storage-queue");
+const { QueueServiceClient } = require("@azure/storage-queue");
 const config = require("../config/azureConfig");
 
 // ICE Task 2: "Details relating to processing of orders and inventory
@@ -11,10 +11,10 @@ const config = require("../config/azureConfig");
 // same app, polling) reads and processes it later.
 
 function getQueueClient() {
-  return QueueClient.fromConnectionString(
-    config.connectionString,
-    config.ordersQueue
+  const queueServiceClient = QueueServiceClient.fromConnectionString(
+    config.connectionString
   );
+  return queueServiceClient.getQueueClient(config.ordersQueue);
 }
 
 async function ensureQueueExists() {
